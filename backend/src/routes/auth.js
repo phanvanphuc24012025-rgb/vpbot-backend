@@ -56,7 +56,7 @@ auth.post('/verify-otp', async (c) => {
   const record = await db
     .prepare(
       `SELECT * FROM otps WHERE email = ? AND type = 'register' AND verified = 0
-       ORDER BY created_at DESC LIMIT 1`
+       ORDER BY created_at DESC, rowid DESC LIMIT 1`
     )
     .bind(email.toLowerCase())
     .first();
@@ -91,7 +91,7 @@ auth.post('/resend-otp', async (c) => {
 
   const db = c.env.DB;
   const last = await db
-    .prepare(`SELECT * FROM otps WHERE email = ? AND type = ? ORDER BY created_at DESC LIMIT 1`)
+    .prepare(`SELECT * FROM otps WHERE email = ? AND type = ? ORDER BY created_at DESC, rowid DESC LIMIT 1`)
     .bind(email.toLowerCase(), type)
     .first();
 
@@ -128,13 +128,14 @@ auth.post('/resend-otp', async (c) => {
 
 // ---------- POST /auth/login ----------
 auth.post('/login', async (c) => {
-  const { email, password } = await c.req.json();
-  if (!email || !password) return c.json({ message: 'Thiếu email hoặc mật khẩu' }, 400);
+  const { email, identifier, password } = await c.req.json();
+  const loginId = (identifier ?? email ?? '').trim();
+  if (!loginId || !password) return c.json({ message: 'Thiếu email/username hoặc mật khẩu' }, 400);
 
   const db = c.env.DB;
   const user = await db
-    .prepare('SELECT * FROM users WHERE email = ?')
-    .bind(email.toLowerCase())
+    .prepare('SELECT * FROM users WHERE email = ? OR username = ?')
+    .bind(loginId.toLowerCase(), loginId)
     .first();
 
   if (!user) return c.json({ message: 'Email hoặc mật khẩu không đúng' }, 401);
@@ -185,7 +186,7 @@ auth.post('/reset-password', async (c) => {
   const record = await db
     .prepare(
       `SELECT * FROM otps WHERE email = ? AND type = 'reset' AND verified = 0
-       ORDER BY created_at DESC LIMIT 1`
+       ORDER BY created_at DESC, rowid DESC LIMIT 1`
     )
     .bind(email.toLowerCase())
     .first();
