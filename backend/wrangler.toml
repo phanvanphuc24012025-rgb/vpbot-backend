@@ -14,6 +14,7 @@ database_id = "153d6abb-5581-42f4-9d58-064c06375058"
 [vars]
 DEV_MODE = "true"          # true = API trả luôn mã OTP trong response để test (KHÔNG bật ở production)
 JWT_EXPIRES_IN_SECONDS = "604800"  # 7 ngày
+EMAIL_FROM = "VPBot <onboarding@resend.dev>"
 
 # Biến bí mật (KHÔNG khai báo giá trị ở đây), set bằng:
 #   npx wrangler secret put JWT_SECRET
