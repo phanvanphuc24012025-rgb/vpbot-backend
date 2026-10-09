@@ -1,0 +1,20 @@
+name = "vpbot-backend"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# D1 database binding.
+# Tạo DB bằng: npx wrangler d1 create vpbot-db
+# rồi dán "database_id" nó trả về vào đây.
+[[d1_databases]]
+binding = "DB"
+database_name = "vpbot-db"
+database_id = "153d6abb-5581-42f4-9d58-064c06375058"
+
+# Biến môi trường không bí mật
+[vars]
+DEV_MODE = "true"          # true = API trả luôn mã OTP trong response để test (KHÔNG bật ở production)
+JWT_EXPIRES_IN_SECONDS = "604800"  # 7 ngày
+
+# Biến bí mật (KHÔNG khai báo giá trị ở đây), set bằng:
+#   npx wrangler secret put JWT_SECRET
+#   npx wrangler secret put RESEND_API_KEY   (tuỳ chọn, để gửi email OTP thật)
